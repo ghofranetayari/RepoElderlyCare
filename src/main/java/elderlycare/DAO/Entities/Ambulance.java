@@ -1,9 +1,8 @@
 package elderlycare.DAO.Entities;
 
-<<<<<<< HEAD
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-=======
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,15 +15,14 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-<<<<<<< HEAD
+
 @Data
-=======
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
+
 public class Ambulance implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long ambulanceID;
-<<<<<<< HEAD
+
 
     private String  location;
     private String status;
