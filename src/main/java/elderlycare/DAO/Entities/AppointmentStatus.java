@@ -1,8 +1,9 @@
 package elderlycare.DAO.Entities;
 
 public enum AppointmentStatus {
-    PENDING,
-        COMPLETED,
-        CANCELLED
+    PENDING,APPROVED,
+    COMPLETED,
+    CANCELLED,
+    REJECTED
     }
 

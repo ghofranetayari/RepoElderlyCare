@@ -14,16 +14,15 @@ import java.util.List;
 @Builder
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     long productId;
 
-    private String productName;
-    private  String prodDesc;
-    private Double price;
-    private Double prodCapacity;
-    private String ArchProd;
-    @Lob
-    byte[] image;
-
+    String productName;
+    String prodDesc;
+    float price;
+    Double prodCapacity;
+    String ArchProd ;
+    String imageUrl;
+    boolean discounted; // Flag to track if the product has been discounted
 
 }

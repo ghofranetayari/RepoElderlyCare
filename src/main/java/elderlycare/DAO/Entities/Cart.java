@@ -1,9 +1,11 @@
 package elderlycare.DAO.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,13 +19,14 @@ import java.util.Set;
 public class Cart {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private long cartId;
-    private String quantite ;
+    long cartId;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy="cartss")
-    Set<Orderr> orders;
+    Set<Orderr> orders = new HashSet<>();
 
 }
+
 
 
 

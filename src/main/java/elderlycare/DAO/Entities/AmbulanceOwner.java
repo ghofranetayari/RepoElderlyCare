@@ -19,16 +19,21 @@ public class AmbulanceOwner implements Serializable {
     private long AmbulanceOwnerID;
 
     private String password;
-    private long phoneNumber;
+    private String phoneNumber;
     private String firstName;
     private String lastName;
     private String email;
     private LocalDate dateOfBirth;
     private String address;
+    private String gender;
 
-    private long Yearsofexperience;
+    private String role;
 
+    private String yearsofexperience;
 
+    @OneToOne
+    @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
+    private OurUsers user;
 
     @OneToMany(mappedBy = "ambulanceowner")
     List<Ambulance> ambulanceList;
@@ -36,6 +41,9 @@ public class AmbulanceOwner implements Serializable {
     @OneToMany
     List<Complaint> complaintList;
 
-    @OneToMany
-    List<Message> messages;
+
+
+    public Long getAmbulanceOwnerID() {
+        return AmbulanceOwnerID;
+    }
 }

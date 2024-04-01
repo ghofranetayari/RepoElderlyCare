@@ -19,21 +19,34 @@ public class AmbulanceDriver implements Serializable {
     private long AmbulanceDriverID;
 
     private String password;
-    private long phoneNumber;
+    private String phoneNumber;
     private String firstName;
     private String lastName;
     private String email;
     private LocalDate dateOfBirth;
     private String address;
+    private String gender;
+    private String role;
 
     private boolean onDuty;
-    private long drivingExperienceYears;
+    private String drivingExperienceYears;
 
+
+    public boolean getOnDuty() {
+        return onDuty;
+    }
+
+    @OneToOne
+    @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
+    private OurUsers user;
 
 
     @OneToOne(mappedBy = "ambulancedriver")
     Ambulance ambulance;
 
-    @OneToMany
-    List<Message> messageList;
+
+    public Long getAmbulanceDriverID() {
+        return AmbulanceDriverID;
+    }
+
 }

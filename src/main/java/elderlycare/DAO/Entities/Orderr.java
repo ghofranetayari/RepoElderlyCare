@@ -1,5 +1,6 @@
 package elderlycare.DAO.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,11 +22,19 @@ public class Orderr {
     Date orderDate;
     String orderStatus;
     float price;
+    private double totalPrice;
+    int quantite; // Add quantity field
+    private String paymentIntentId;
 
+    @JsonIgnore
     @ManyToOne
     Cart cartss;
+
+
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     Product product;
+    String productName;
 
 
 

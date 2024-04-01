@@ -1,5 +1,5 @@
 package elderlycare.DAO.Entities;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -22,16 +22,26 @@ public class Appointment implements Serializable{
 
     @Id
     private long idAppointment;
-    private Date dateApp;
-    private String location;
+    private String patientName;
+    private String appFrom;
+
+    private String appTo;
+    private Boolean appFirst;
+    private String symptom;
+
+    @Column(name = "app_status", length = 20) // adjust length as needed
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus appStatus;
     //this
-    private AppointmentStatus appointmentStatus;
     private String archiveApp ;
-    @ManyToOne
-    @JoinColumn(name = "doctor_id")
+ /*  @JsonManagedReference@JsonIgnoreProperties("appointments") // Replace "appointments" with the actual property name in the Doctor entity
+
+   @ManyToOne
+   @JoinColumn(name = "doctor_id")
     private Doctor doctor2;
+  //  @JsonBackReference
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
-    private Elderly patient;
+    private Elderly patient;*/
 }

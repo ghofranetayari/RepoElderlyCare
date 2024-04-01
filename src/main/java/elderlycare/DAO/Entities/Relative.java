@@ -25,16 +25,27 @@ public class Relative implements Serializable {
     private String relationship;
 
     private String password;
-    private long phoneNumber;
+    private String phoneNumber;
     private String firstName;
     private String lastName;
     private String email;
     private LocalDate dateOfBirth;
     private String address;
+    private String gender;
+    private long etats;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Message> Messages;
+    @OneToOne
+    @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
+    private OurUsers user;
+
+
 
     @ManyToOne
     Elderly elderly;
+    private String role;
+
+    public Long getRelativeID() {
+        return idRelative;
+    }
+
 }
