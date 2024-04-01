@@ -1,5 +1,6 @@
 package elderlycare.DAO.Repositories;
 
+<<<<<<< HEAD
 import elderlycare.DAO.Entities.Appointment;
 import elderlycare.DAO.Entities.Doctor;
 import elderlycare.DAO.Entities.Elderly;
@@ -12,10 +13,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+=======
+import elderlycare.DAO.Entities.Elderly;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 
 @Repository
 public interface ElderlyRepository extends JpaRepository<Elderly, Long> {
     // You can add custom query methods here if needed
+<<<<<<< HEAD
 
     Optional<Elderly> findById(Long id);
 
@@ -34,4 +42,6 @@ public interface ElderlyRepository extends JpaRepository<Elderly, Long> {
     Optional<Elderly> findByEmail(String email);
 
 
+=======
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }

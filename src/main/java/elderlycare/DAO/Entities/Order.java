@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
@@ -11,20 +13,19 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TodoList {
+public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    int idtodolist;
-    String task ;
-    Boolean StatusTodolist ;
+    long orderId;
 
-<<<<<<< HEAD
+    Date orderDate;
+    String orderStatus;
+    float price;
 
-=======
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
-    @OneToOne
+    @ManyToOne
+    Cart cart;
+    @ManyToOne
     @JoinColumn(name = "elderly_id")
-    Elderly elderlyt;
-
+    Elderly elderlyo ;
 
 }

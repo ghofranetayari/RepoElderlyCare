@@ -8,7 +8,10 @@ import lombok.*;
 
 
 import java.io.Serializable;
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,13 +23,20 @@ import java.util.Set;
 @Entity
 public class Doctor implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+<<<<<<< HEAD
     @Id
     private long idDoctor;
     private String imagedoc;
+=======
+
+    @Id
+    private long idDoctor;
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
     private String doctorType;
     private String specialization; // Cardiology, Oncology, etc.
     private String schedule; // "Monday, Wednesday, Friday: 9am-5pm"
     private String username;
+<<<<<<< HEAD
     private String firstName;
     private String lastName;
     private String password;
@@ -84,3 +94,17 @@ public class Doctor implements Serializable{
     }
 
 }
+=======
+    private String password;
+    private String phoneNumber;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="doctor")
+    private List<MedicalFolder> medicalFolders;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Appointment> appointments;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Message> Messages;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Complaint> Complaints;
+}
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
