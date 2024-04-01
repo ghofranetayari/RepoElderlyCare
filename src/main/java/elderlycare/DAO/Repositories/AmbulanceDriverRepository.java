@@ -1,6 +1,7 @@
 package elderlycare.DAO.Repositories;
 
 import elderlycare.DAO.Entities.AmbulanceDriver;
+<<<<<<< HEAD
 import elderlycare.DAO.Entities.Doctor;
 import elderlycare.DAO.Entities.OurUsers;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,9 @@ public interface AmbulanceDriverRepository extends JpaRepository<AmbulanceDriver
 
     AmbulanceDriver findByUser_Id(Long userId);
 
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AmbulanceDriverRepository extends JpaRepository<AmbulanceDriver,Long> {
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }

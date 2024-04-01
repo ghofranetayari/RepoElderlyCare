@@ -1,6 +1,7 @@
 package elderlycare.DAO.Repositories;
 
 import elderlycare.DAO.Entities.Appointment;
+<<<<<<< HEAD
 import elderlycare.DAO.Entities.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,3 +23,9 @@ public interface AppointementRepository extends JpaRepository<Appointment,Long> 
     @Query("SELECT a FROM Appointment a WHERE a.appFrom >= :startDate AND a.appFrom <= :endDate AND a.appStatus = :appStatus AND a.archiveApp = '0'")
     List<Appointment> findByAppFromBetweenAndAppStatusAndArchiveAppIsFalse(String startDate, String endDate, AppointmentStatus appStatus);
 }
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AppointementRepository extends JpaRepository<Appointment,Long> {
+}
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae

@@ -1,6 +1,7 @@
 package elderlycare.DAO.Repositories;
 
 import elderlycare.DAO.Entities.Product;
+<<<<<<< HEAD
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +28,9 @@ public interface ProductRepository extends JpaRepository <Product,Long> {
     @Query("UPDATE Product p SET p.price = p.price / 0.8, p.discounted = false WHERE p.discounted = true")
     void removeDiscount();
 
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRepository extends JpaRepository <Product,Long> {
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }

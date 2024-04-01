@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 import java.util.List;
 
 @Entity
@@ -17,6 +20,7 @@ public class AmbulanceDriver implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long AmbulanceDriverID;
+<<<<<<< HEAD
 
     private String password;
     private String phoneNumber;
@@ -49,4 +53,13 @@ public class AmbulanceDriver implements Serializable {
         return AmbulanceDriverID;
     }
 
+=======
+    private Boolean onDuty;
+    private long drivingExperienceYears;
+   @OneToOne(mappedBy = "ambulancedriver")
+    Ambulance ambulance;
+
+   @OneToMany
+    List<Message> messageList;
+>>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }
