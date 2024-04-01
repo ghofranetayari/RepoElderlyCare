@@ -24,8 +24,4 @@ public class Medication implements Serializable{
     private String dose;
     private String frequency;
     private String instructions;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae

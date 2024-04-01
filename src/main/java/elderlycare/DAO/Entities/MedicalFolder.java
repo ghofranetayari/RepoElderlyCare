@@ -33,8 +33,4 @@ public class MedicalFolder implements Serializable {
     Doctor doctor;
     @OneToOne
     private Elderly elderlyMedF;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae

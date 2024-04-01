@@ -1,6 +1,5 @@
 package elderlycare.DAO.Repositories;
 
-<<<<<<< HEAD
 import elderlycare.DAO.Entities.Appointment;
 import elderlycare.DAO.Entities.Doctor;
 import elderlycare.DAO.Entities.OurUsers;
@@ -41,10 +40,4 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> , JpaSpeci
 
     Optional<Doctor> findByUserId(Integer userId);
 
-=======
-import elderlycare.DAO.Entities.Doctor;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface DoctorRepository extends JpaRepository<Doctor,Long> {
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }

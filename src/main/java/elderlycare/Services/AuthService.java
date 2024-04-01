@@ -2,9 +2,9 @@ package elderlycare.Services;
 
 
 import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import elderlycare.DAO.Entities.*;
+import elderlycare.DAO.Entities.Calendar;
 import elderlycare.DAO.Repositories.*;
 import elderlycare.dto.NurseReqRes;
 import elderlycare.dto.ReqRes;
@@ -12,13 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class AuthService {
@@ -32,8 +38,8 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthenticationManager authenticationManager;
-@Autowired
-private  CalendarRepository calendarRepository;
+    @Autowired
+    private  CalendarRepository calendarRepository;
     @Autowired
     private DoctorRepository doctorRepository;
     @Autowired
@@ -110,7 +116,7 @@ private  CalendarRepository calendarRepository;
                 Doctor savedDoctor = doctorRepository.save(doctor);
 
                 Calendar calendar = new Calendar();
-                 calendar.setDoctor(savedDoctor);
+                calendar.setDoctor(savedDoctor);
 
                 // Save the calendar entry
                 Calendar savedCalendar = calendarRepository.save(calendar);

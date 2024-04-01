@@ -27,8 +27,8 @@ public class ProfileService {
     private AmbulanceDriverRepository ambulanceDriverRepository;
     @Autowired
     private AmbulanceOwnerRepository ambulanceOwnerRepository;
-@Autowired
-private  RelativeRepository relativeRepository;
+    @Autowired
+    private  RelativeRepository relativeRepository;
     public ReqRes getUserProfile(Long userId) {
         Doctor doctor = doctorRepository.findByUser_Id(userId);
         if (doctor != null) {
@@ -250,23 +250,23 @@ private  RelativeRepository relativeRepository;
                     ambulanceOwner.setEmail(updatedUser.getEmail());
                     ambulanceOwnerRepository.save(ambulanceOwner);}
             }
-          else if ("relative".equals(oldUser.getRole())) {
-            Relative relative = relativeRepository.findByUser(oldUser);
-            if (relative != null) {
-                relative.setLastName(updatedUser.getLastName());
-                relative.setFirstName(updatedUser.getFirstName());
-                relative.setPhoneNumber(updatedUser.getPhoneNumber());
-                relative.setGender(updatedUser.getGender());
-                relative.setDateOfBirth(updatedUser.getDateOfBirth());
-                relative.setRelationship(updatedUser.getRelationship());
+            else if ("relative".equals(oldUser.getRole())) {
+                Relative relative = relativeRepository.findByUser(oldUser);
+                if (relative != null) {
+                    relative.setLastName(updatedUser.getLastName());
+                    relative.setFirstName(updatedUser.getFirstName());
+                    relative.setPhoneNumber(updatedUser.getPhoneNumber());
+                    relative.setGender(updatedUser.getGender());
+                    relative.setDateOfBirth(updatedUser.getDateOfBirth());
+                    relative.setRelationship(updatedUser.getRelationship());
 
-                relative.setAddress(updatedUser.getAddress());
-                relative.setEmail(updatedUser.getEmail());
-                relativeRepository.save(relative);}
-        }
+                    relative.setAddress(updatedUser.getAddress());
+                    relative.setEmail(updatedUser.getEmail());
+                    relativeRepository.save(relative);}
+            }
 
 
-        // Mettez à jour l'e-mail s'il est fourni et valide
+            // Mettez à jour l'e-mail s'il est fourni et valide
             if (updatedUser.getEmail() != null) {
                 if (!Pattern.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", updatedUser.getEmail())) {
                     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Please enter a valid email");

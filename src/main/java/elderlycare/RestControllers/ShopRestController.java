@@ -1,6 +1,5 @@
-package RestControllers;
+package elderlycare.RestControllers;
 
-import Services.ShopService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -9,6 +8,7 @@ import elderlycare.DAO.Entities.Elderly;
 import elderlycare.DAO.Entities.Orderr;
 import elderlycare.DAO.Entities.Product;
 import elderlycare.DAO.Repositories.*;
+import elderlycare.Services.ShopService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +23,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor

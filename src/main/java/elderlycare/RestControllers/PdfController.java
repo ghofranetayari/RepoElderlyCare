@@ -1,6 +1,6 @@
-package RestControllers;
+package elderlycare.RestControllers;
 
-import Services.ShopService;
+import elderlycare.Services.ShopService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

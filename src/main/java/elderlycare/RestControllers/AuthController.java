@@ -5,16 +5,21 @@ import elderlycare.DAO.Entities.*;
 import elderlycare.DAO.Repositories.*;
 import elderlycare.Services.AuthService;
 import elderlycare.Services.OurUserDetailsService;
+import elderlycare.Services.ResetPasswordRequest;
 import elderlycare.Services.UserService;
 import elderlycare.dto.NurseReqRes;
 import elderlycare.dto.ReqRes;
 import jakarta.annotation.security.PermitAll;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -25,8 +30,8 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-@Autowired
-private RelativeRepository relativeRepository;
+    @Autowired
+    private RelativeRepository relativeRepository;
     @Autowired
     private OurUserDetailsService userService;
 
@@ -217,9 +222,11 @@ private RelativeRepository relativeRepository;
     }
 
 
+    @PutMapping("/reset-password")
+    public OurUsers resetPassword(@RequestBody ResetPasswordRequest request) {
+        return authService.ResetPassword(request.getEmail(), request.getPassword());
 
-
-
+    }
   /*  @PutMapping("/resetPasswordPhone")
     public OurUsers resetPasswordPhone(@RequestBody ResetPasswordRequest request) {
         return authService.ResetPasswordPhone(request.getPhoneNumber(), request.getPassword());
@@ -338,7 +345,22 @@ private RelativeRepository relativeRepository;
     }
 
 
+    //mariem
+    @GetMapping("/online-status")
+    public ResponseEntity<?> getOnlineStatus() {
+        try {
+            Map<String, Boolean> onlineStatus = userServiceM.getOnlineStatus();
+            return ResponseEntity.ok(onlineStatus);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching online status");
+        }
+    }
 
+    //mariem
+    @PutMapping("/update-online-status/{email}")
+    public void updateUserOnlineStatus(@PathVariable String email, @RequestBody boolean online) {
+        userServiceM.updateUserOnlineStatus(email, online);
+    }
 
 
 }

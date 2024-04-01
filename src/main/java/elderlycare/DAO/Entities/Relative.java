@@ -8,10 +8,7 @@ import lombok.*;
 
 
 import java.io.Serializable;
-<<<<<<< HEAD
 import java.time.LocalDate;
-=======
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 import java.util.HashSet;
 import java.util.Set;
 @Builder
@@ -26,7 +23,6 @@ public class Relative implements Serializable {
     @Id
     private long idRelative;
     private String relationship;
-<<<<<<< HEAD
 
     private String password;
     private String phoneNumber;
@@ -42,7 +38,8 @@ public class Relative implements Serializable {
     @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
     private OurUsers user;
 
-
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Message> Messages;
 
     @ManyToOne
     Elderly elderly;
@@ -52,15 +49,4 @@ public class Relative implements Serializable {
         return idRelative;
     }
 
-=======
-    private String username;
-    private String password;
-    private String phoneNumber;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Message> Messages;
-
-    @ManyToOne
-    Elderly elderly;
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }

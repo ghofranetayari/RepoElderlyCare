@@ -18,10 +18,7 @@ public class TodoList {
     String task ;
     Boolean StatusTodolist ;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
     @OneToOne
     @JoinColumn(name = "elderly_id")
     Elderly elderlyt;

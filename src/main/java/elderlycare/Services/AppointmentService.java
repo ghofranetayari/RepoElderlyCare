@@ -23,9 +23,9 @@ import java.util.Optional;
 @AllArgsConstructor
 @Slf4j
 public class AppointmentService implements IAppointmentService {
-      AppointementRepository appointmentRepository;
-      ElderlyRepository     elderlyRepository;
-      CalendarRepository calendarRepository;
+    AppointementRepository appointmentRepository;
+    ElderlyRepository     elderlyRepository;
+    CalendarRepository calendarRepository;
 
     @Transactional
 
@@ -34,27 +34,27 @@ public class AppointmentService implements IAppointmentService {
     }
 
 
-  /*  @Transactional
+    /*  @Transactional
+      @Override
+      public List<Appointment> getTodaysAppointments() {
+          LocalDate today = LocalDate.now();
+          LocalDateTime startOfDay = today.atStartOfDay();
+          LocalDateTime endOfDay = today.atTime(23, 59, 59); // Set end time to 23:59:59
+
+          return appointmentRepository.findByAppFromAfterAndAppToBefore(
+                  Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()),
+                  Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
+          );
+      }*/
+    @Transactional
     @Override
     public List<Appointment> getTodaysAppointments() {
         LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(23, 59, 59); // Set end time to 23:59:59
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'00:00:00"));
+        String endOfDay = today.atTime(23, 59, 59).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 
-        return appointmentRepository.findByAppFromAfterAndAppToBefore(
-                Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()),
-                Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
-        );
-    }*/
-  @Transactional
-  @Override
-  public List<Appointment> getTodaysAppointments() {
-      LocalDate today = LocalDate.now();
-      String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'00:00:00"));
-      String endOfDay = today.atTime(23, 59, 59).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-
-      return appointmentRepository.findByAppFromAfterAndAppToBefore(startOfDay, endOfDay);
-  }
+        return appointmentRepository.findByAppFromAfterAndAppToBefore(startOfDay, endOfDay);
+    }
 
 
 
@@ -70,49 +70,49 @@ public class AppointmentService implements IAppointmentService {
             throw new EntityNotFoundException("Appointment not found with id: " + id);
         }
     }
-/*
+    /*
+        @Override
+        public Appointment createAppointment(Appointment appointment) {
+            return appointmentRepository.save(appointment);
+        }*/
     @Override
-    public Appointment createAppointment(Appointment appointment) {
-        return appointmentRepository.save(appointment);
-    }*/
-@Override
-@Transactional
-public Appointment createAppointment(Appointment appointment, Long elderlyId, long calendarId) {
-    Elderly elderly = elderlyRepository.findById(elderlyId).orElse(null);
-    Calendar calendar = calendarRepository.findById(calendarId).orElse(null);
+    @Transactional
+    public Appointment createAppointment(Appointment appointment, Long elderlyId, long calendarId) {
+        Elderly elderly = elderlyRepository.findById(elderlyId).orElse(null);
+        Calendar calendar = calendarRepository.findById(calendarId).orElse(null);
 
-    if (elderly != null && calendar != null) {
-        // Load the appointment entity within the current transactional context
-        Appointment existingAppointment = appointmentRepository.findById(appointment.getIdAppointment()).orElse(null);
+        if (elderly != null && calendar != null) {
+            // Load the appointment entity within the current transactional context
+            Appointment existingAppointment = appointmentRepository.findById(appointment.getIdAppointment()).orElse(null);
 
-        if (existingAppointment == null) {
-            // If the appointment doesn't exist, it's a new appointment, so set the relationship and save
-            elderly.getAppointments().add(appointment);
-            calendar.getAppointments().add(appointment);
-            appointment.setArchiveApp("0");
+            if (existingAppointment == null) {
+                // If the appointment doesn't exist, it's a new appointment, so set the relationship and save
+                elderly.getAppointments().add(appointment);
+                calendar.getAppointments().add(appointment);
+                appointment.setArchiveApp("0");
 
-            elderlyRepository.save(elderly);
-            calendarRepository.save(calendar);
-            appointmentRepository.save(appointment);
+                elderlyRepository.save(elderly);
+                calendarRepository.save(calendar);
+                appointmentRepository.save(appointment);
+            } else {
+                // If the appointment already exists, update its properties and save
+                existingAppointment.setAppFrom(appointment.getAppFrom());
+                existingAppointment.setAppTo(appointment.getAppTo());
+                existingAppointment.setAppFirst(appointment.getAppFirst());
+                existingAppointment.setSymptom(appointment.getSymptom());
+                existingAppointment.setAppStatus(appointment.getAppStatus());
+
+                elderlyRepository.save(elderly);
+                calendarRepository.save(calendar);
+                appointmentRepository.save(existingAppointment);
+            }
+
+            return appointment;
         } else {
-            // If the appointment already exists, update its properties and save
-            existingAppointment.setAppFrom(appointment.getAppFrom());
-            existingAppointment.setAppTo(appointment.getAppTo());
-            existingAppointment.setAppFirst(appointment.getAppFirst());
-            existingAppointment.setSymptom(appointment.getSymptom());
-            existingAppointment.setAppStatus(appointment.getAppStatus());
-
-            elderlyRepository.save(elderly);
-            calendarRepository.save(calendar);
-            appointmentRepository.save(existingAppointment);
+            // Handle the case where the Elderly or Calendar entity with the given ID is not found
+            return null;
         }
-
-        return appointment;
-    } else {
-        // Handle the case where the Elderly or Calendar entity with the given ID is not found
-        return null;
     }
-}
 
     @Transactional
     public void cancelAppointment(long id) {

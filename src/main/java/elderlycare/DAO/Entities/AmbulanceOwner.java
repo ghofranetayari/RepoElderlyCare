@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-<<<<<<< HEAD
 import java.time.LocalDate;
-=======
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 import java.util.List;
 
 @Entity
@@ -20,7 +17,6 @@ public class AmbulanceOwner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long AmbulanceOwnerID;
-<<<<<<< HEAD
 
     private String password;
     private String phoneNumber;
@@ -39,23 +35,15 @@ public class AmbulanceOwner implements Serializable {
     @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
     private OurUsers user;
 
-=======
-    private long Yearsofexperience;
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
     @OneToMany(mappedBy = "ambulanceowner")
     List<Ambulance> ambulanceList;
 
     @OneToMany
     List<Complaint> complaintList;
 
-<<<<<<< HEAD
 
 
     public Long getAmbulanceOwnerID() {
         return AmbulanceOwnerID;
     }
-=======
-    @OneToMany
-    List<Message> messages;
->>>>>>> a91cccbc16c00c02dfa62d7def9d2a41298a99ae
 }
