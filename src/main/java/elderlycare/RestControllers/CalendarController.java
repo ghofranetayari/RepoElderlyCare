@@ -4,6 +4,7 @@ import elderlycare.DAO.Entities.Calendar;
 import elderlycare.DAO.Entities.Elderly;
 import elderlycare.DAO.Entities.OurUsers;
 import elderlycare.Services.ICalendarService;
+import elderlycare.Services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import java.util.Optional;
 
 public class CalendarController {
     private  ICalendarService calendarService;
-   // private UserService ourUsersService;
+    private UserService ourUsersService;
 
     @GetMapping("/settings/{id}")
     public Calendar getCalendarSettingsById(  @PathVariable Long id) {
@@ -90,7 +91,7 @@ public class CalendarController {
         Optional<String> elderlyNameOptional = calendarService.getElderlyNameByAppointmentId(appointmentId);
         return elderlyNameOptional.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
-/*
+
     @GetMapping("/details/{email}")
     public ResponseEntity<OurUsers> getUserDetailsByEmail(@PathVariable String email) {
         Optional<OurUsers> optionalUser = ourUsersService.getUserDetailsByEmail(email);
@@ -99,6 +100,6 @@ public class CalendarController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }*/
+    }
 
 }
