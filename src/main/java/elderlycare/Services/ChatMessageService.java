@@ -58,11 +58,6 @@ public class ChatMessageService {
     }
 
 
-
-
-
-    // ChatMessageService.java
-
     public List<ChatMessage> getMessages(String userId1, String userId2) {
         List<ChatMessage> messages = chatMessageRepository
                 .findBySenderIdAndRecipientIdOrSenderIdAndRecipientIdOrderByTimestampAsc(
@@ -81,12 +76,17 @@ public class ChatMessageService {
     public List<ChatMessage> getUnseenMessages(String currentUserEmail, String senderEmail) {
         return chatMessageRepository.findByRecipientIdAndSenderIdAndSeen(currentUserEmail, senderEmail, false);
     }
+
+
+
+
+    //SCHEDULAR for nurse
     public void sendMorningMessageToElderly(Nurse nurse, Elderly elderly) {
-        sendMessage(nurse.getEmail(), elderly.getEmail(), "Good morning! Have a wonderful day! don't forget your meds");
+        sendMessage(nurse.getEmail(), elderly.getEmail(), "Good morning! Have a wonderful day! don't forget your meds let me know if you need anything ");
     }
 
     public void sendEveningMessageToElderly(Nurse nurse, Elderly elderly) {
-        sendMessage(nurse.getEmail(), elderly.getEmail(), "Good evening! Hope you had a great day!don't forget your meds");
+        sendMessage(nurse.getEmail(), elderly.getEmail(), "Good evening! Hope you had a great day!don't forget your meds,let me know if you need anything");
     }
 
 }

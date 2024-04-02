@@ -3,7 +3,6 @@ package elderlycare.RestControllers;
 import elderlycare.DAO.Entities.ChatMessage;
 import elderlycare.DAO.Entities.OurUsers;
 import elderlycare.Services.ChatMessageService;
-import elderlycare.Services.UserServiceM;
 import elderlycare.dto.ChatMessageRequest;
 import elderlycare.dto.VoiceMessageRequest;
 import jakarta.annotation.security.PermitAll;
@@ -39,7 +38,7 @@ public class ChatController {
     @PostMapping("/send-voice-message")
     public ResponseEntity<Object> sendVoiceMessage(@RequestBody VoiceMessageRequest request) {
 
-            byte[] audioData = request.getAudioContent(); // Get audio data from request
+            byte[] audioData = request.getAudioContent();
             chatService.saveVoiceMessage(request.getSenderId(), request.getRecipientId(), audioData);
             return ResponseEntity.ok().body(Map.of("message", "Voice message saved successfully"));
     }
@@ -85,12 +84,12 @@ public class ChatController {
         return ResponseEntity.ok(users);
     }
 
-/*
+
     //mariem
     @GetMapping("/online-status")
     public ResponseEntity<?> getOnlineStatus() {
         try {
-            Map<String, Boolean> onlineStatus = userServiceM.getOnlineStatus();
+            Map<String, Boolean> onlineStatus = userService.getOnlineStatus();
             return ResponseEntity.ok(onlineStatus);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching online status");
@@ -100,8 +99,8 @@ public class ChatController {
     //mariem
     @PutMapping("/update-online-status/{email}")
     public void updateUserOnlineStatus(@PathVariable String email, @RequestBody boolean online) {
-        userServiceM.updateUserOnlineStatus(email, online);
-    }*/
+        userService.updateUserOnlineStatus(email, online);
+    }
 
 }
 
