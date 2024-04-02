@@ -13,18 +13,18 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository <Product,Long> {
   List<Product> findByProductNameStartingWithIgnoreCase(String searchTerm);
-        @Query("SELECT p FROM Product p WHERE p.ArchProd = 'Available'")
-        Page<Product> findAllAvailableProducts(Pageable pageable);
+  @Query("SELECT p FROM Product p WHERE p.ArchProd = 'Available'")
+  Page<Product> findAllAvailableProducts(Pageable pageable);
 
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Product p SET p.price = p.price * 0.8, p.discounted = true WHERE p.discounted = false")
-    void applyDiscount();
+  @Transactional
+  @Modifying
+  @Query("UPDATE Product p SET p.price = p.price * 0.8, p.discounted = true WHERE p.discounted = false")
+  void applyDiscount();
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Product p SET p.price = p.price / 0.8, p.discounted = false WHERE p.discounted = true")
-    void removeDiscount();
+  @Transactional
+  @Modifying
+  @Query("UPDATE Product p SET p.price = p.price / 0.8, p.discounted = false WHERE p.discounted = true")
+  void removeDiscount();
 
 }

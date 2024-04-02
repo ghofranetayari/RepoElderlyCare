@@ -1,16 +1,14 @@
 package elderlycare.RestControllers;
-
 import elderlycare.DAO.Entities.ChatMessage;
 import elderlycare.DAO.Entities.OurUsers;
 import elderlycare.Services.ChatMessageService;
+import elderlycare.Services.UserService;
 import elderlycare.dto.ChatMessageRequest;
 import elderlycare.dto.VoiceMessageRequest;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +18,10 @@ import java.util.Map;
 @PermitAll
 public class ChatController {
     private final ChatMessageService chatService;
-    private final UserServiceM userService;
+    private final UserService userService;
 
     @Autowired
-    public ChatController(ChatMessageService chatService, UserServiceM userService) {
+    public ChatController(ChatMessageService chatService, UserService userService) {
         this.chatService = chatService;
         this.userService = userService;
     }
@@ -41,6 +39,9 @@ public class ChatController {
             byte[] audioData = request.getAudioContent();
             chatService.saveVoiceMessage(request.getSenderId(), request.getRecipientId(), audioData);
             return ResponseEntity.ok().body(Map.of("message", "Voice message saved successfully"));
+        byte[] audioData = request.getAudioContent(); // Get audio data from request
+        chatService.saveVoiceMessage(request.getSenderId(), request.getRecipientId(), audioData);
+        return ResponseEntity.ok().body(Map.of("message", "Voice message saved successfully"));
     }
 
     // ChatController.java
@@ -102,10 +103,5 @@ public class ChatController {
         userService.updateUserOnlineStatus(email, online);
     }
 
+
 }
-
-
-
-
-
-

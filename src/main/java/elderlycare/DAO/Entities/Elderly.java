@@ -62,7 +62,8 @@ public class Elderly {
     private List<Complaint> Complaints;
 
 
-
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Message> Messages;
 
 
 

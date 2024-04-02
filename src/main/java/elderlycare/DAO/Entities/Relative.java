@@ -38,7 +38,8 @@ public class Relative implements Serializable {
     @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
     private OurUsers user;
 
-
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Message> Messages;
 
     @ManyToOne
     Elderly elderly;

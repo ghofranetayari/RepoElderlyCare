@@ -44,7 +44,8 @@ public class AmbulanceDriver implements Serializable {
     @OneToOne(mappedBy = "ambulancedriver")
     Ambulance ambulance;
 
-
+    @OneToMany
+    List<Message> messageList;
     public Long getAmbulanceDriverID() {
         return AmbulanceDriverID;
     }

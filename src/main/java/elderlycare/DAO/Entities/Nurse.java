@@ -41,7 +41,8 @@ public class Nurse {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<Complaint> Complaints;
 
-
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<Message> Messages;
     public Long getNurseID() {
         return nurseID;
     }

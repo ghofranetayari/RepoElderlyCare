@@ -16,4 +16,5 @@ public interface AmbulanceOwnerRepository extends JpaRepository<AmbulanceOwner,L
 
     AmbulanceOwner findByUser_Id(Long userId);
 
+
 }

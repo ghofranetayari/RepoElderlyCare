@@ -11,6 +11,7 @@ public class ElderlyCareApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ElderlyCareApplication.class, args);
+        System.out.println("a");
     }
 
 }
