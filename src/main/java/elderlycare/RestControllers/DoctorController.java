@@ -2,15 +2,23 @@ package elderlycare.RestControllers;
 
 import elderlycare.DAO.Entities.*;
 import elderlycare.DAO.Repositories.DoctorRepository;
+import elderlycare.DAO.Repositories.ElderlyRepository;
 import elderlycare.Services.IDoctorService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +31,7 @@ import java.util.stream.Collectors;
 public class DoctorController {
     private IDoctorService iDoctorService;
     private DoctorRepository doctorRepository;
+    private ElderlyRepository elderlyRepository;
     @GetMapping("/{doctorId}")
     public ResponseEntity<Doctor> getDoctorProfile(@PathVariable Long doctorId) {
         Doctor doctor = iDoctorService.getDoctorProfile(doctorId);
@@ -378,6 +387,13 @@ public class DoctorController {
             return ResponseEntity.notFound().build(); // Review not found or unauthorized
         }
     }
+
+    @GetMapping("/elderly/{elderlyId}/banned-status")
+    public ResponseEntity<Boolean> getElderlyBannedStatus(@PathVariable Long elderlyId) {
+        boolean isBanned = iDoctorService.getElderlyBannedStatus(elderlyId);
+        return ResponseEntity.ok(isBanned);
+    }
+
     @DeleteMapping("/del/{doctorId}/{reviewId}/{elderlyId}")
     public ResponseEntity<String> deleteReview(
             @PathVariable Long doctorId,
@@ -520,7 +536,7 @@ public class DoctorController {
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
      }   }*/
-     @GetMapping
+    @GetMapping
     public ResponseEntity<List<Doctor>> getAllDoctors() {
         List<Doctor> doctors = iDoctorService
                 .getAllDoctors();
@@ -577,4 +593,18 @@ public class DoctorController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete cabinet pictures");
         }
     }
+    @GetMapping("/{elderlyid}/checkArchivedStatus")
+    public boolean checkArchivedStatus(@PathVariable Long elderlyid) {
+        Elderly elderly = elderlyRepository.findById(elderlyid).orElse(null);
+        if (elderly != null) {
+            return elderly.getUser().isArchive();
+        }
+        return false; // Return false if elderly not found or archive status is false
+    }
+    @GetMapping("/{elderlyid}/bannedUntil")
+    public ResponseEntity<Date> getElderlyBannedUntil(@PathVariable Long elderlyid) {
+        Date bannedUntil = iDoctorService.getElderlyBannedUntil(elderlyid);
+        return ResponseEntity.ok(bannedUntil);
+    }
+
 }

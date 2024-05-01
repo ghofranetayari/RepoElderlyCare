@@ -4,6 +4,7 @@ import elderlycare.DAO.Entities.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public interface IDoctorService {
   public void save(Long doctorId, MultipartFile file) ;
   public void save2(Long doctorId, MultipartFile file) ;
 
-    public void init() ;
+  public void init() ;
   public List<Review> getAllReviews();
 
   public Review getReviewById(Long id);
@@ -63,7 +64,7 @@ public interface IDoctorService {
 
 
 
-
+  public boolean getElderlyBannedStatus(Long elderlyId) ;
 
 
   public Long getDoctorIdByUserId(Integer userId) ;
@@ -72,5 +73,6 @@ public interface IDoctorService {
 
   public String getDoctorProfileImage(Long doctorId) ;
   void deleteCabinetPicturesByDoctorId(Long doctorId);
+  public Date getElderlyBannedUntil(Long id) ;
 
 }

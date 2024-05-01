@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,6 +41,17 @@ public class DoctorService implements IDoctorService{
     private AppointmentService appointmentService;
     public Doctor getDoctorProfile(Long doctorId) {
         return doctorRepository.findById(doctorId).orElse(null);
+    }
+
+
+
+    // Other methods...
+
+    public boolean getElderlyBannedStatus(Long elderlyId) {
+        Elderly elderly = elderlyRepository.findById(elderlyId)
+                .orElseThrow(() -> new EntityNotFoundException("Elderly not found with ID: " + elderlyId));
+
+        return elderly.isBanned();
     }
 
     /* @Override
@@ -246,7 +258,7 @@ public class DoctorService implements IDoctorService{
 // Update the doctor entity with the updated image doc string
             doctor.setImagedoc(updatedImageDoc);
 
-             doctorRepository.save(doctor);
+            doctorRepository.save(doctor);
         } catch (IOException e) {
             throw new RuntimeException("Error saving cabinet picture", e);
         }
@@ -271,8 +283,66 @@ public class DoctorService implements IDoctorService{
                 .orElseThrow(() -> new NoSuchElementException("Review not found"));
     }
 
+    @Transactional
+    public Review createReview(Review review, Long elderlyId, Long idDoctor) {
+        Elderly elderly = elderlyRepository.findElderlyByElderlyID(elderlyId);
+        Doctor doctor = doctorRepository.findDoctorByIdDoctor(idDoctor);
 
+        if (elderly != null && doctor != null) {
+            // Check for bad words in the comment
+            if (containsBadWords(review.getComment())) {
+                elderly.incrementBadWordCount(); // Increment bad word count for the elderly
+                elderlyRepository.save(elderly); // Save the updated elderly entity
+                if (elderly.getBadWordCount() >= 6) {
+                    elderly.getUser().setArchive(true); // Archive the user account
+                }
 
+                return null; // Do not save the review with bad words
+            }
+            Review existingReview = review.getId() == null ? null : reviewRepository.findById(review.getId()).orElse(null);
+
+            if (existingReview == null) {
+                review.setCreationTime(LocalDateTime.now());
+                review.setElderlyUsername(elderly.getFirstName());
+                review.setElderlyId(elderly.getElderlyID());
+                review.setDoctorId(doctor.getIdDoctor());
+
+                // Save the review
+                elderly.getReviewsE().add(review);
+                doctor.getReviewsD().add(review);
+
+                elderlyRepository.save(elderly);
+                doctorRepository.save(doctor);
+                return reviewRepository.save(review);
+            } else {
+                // Update existing review properties
+                existingReview.setElderlyUsername(elderly.getFirstName());
+                existingReview.setElderlyId(elderly.getElderlyID());
+                existingReview.setDoctorId(doctor.getIdDoctor());
+                existingReview.setComment(review.getComment());
+                existingReview.setRating(review.getRating());
+
+                // Save the updated review
+                elderlyRepository.save(elderly);
+                doctorRepository.save(doctor);
+                return reviewRepository.save(existingReview);
+            }
+        } else {
+            // Handle the case where the Elderly or doctor entity with the given ID is not found
+            return null;
+        }
+    }
+
+    private boolean containsBadWords(String text) {
+        List<String> badWords = Arrays.asList("badword1", "badword2", "badword3"); // List of bad words
+        for (String badWord : badWords) {
+            if (text.toLowerCase().contains(badWord.toLowerCase())) {
+                return true; // Found a bad word
+            }
+        }
+        return false; // No bad words found
+    }
+/*
     @Transactional
     public Review createReview(Review review, Long elderlyId, Long idDoctor) {
 
@@ -313,7 +383,7 @@ public class DoctorService implements IDoctorService{
             // Handle the case where the Elderly or doctor entity with the given ID is not found
             return null;
         }
-    }
+    }*/
 
     public Review updateReview(Long id, Review updatedReview) {
         Review existingReview = getReviewById(id);
@@ -363,7 +433,14 @@ public class DoctorService implements IDoctorService{
             existingReview.setElderlyId(elderly.getElderlyID());
             //   review already exists, update properties and save
 
-            existingReview.setComment(updatedReview.getComment());
+            String comment = updatedReview.getComment();
+            if (containsBadWords(comment)) {
+                elderly.incrementBadWordCount(); // Increment bad word count for the elderly
+                elderlyRepository.save(elderly); // Save the updated elderly entity
+                return null; // Do not save the review with bad words
+            }
+
+            existingReview.setComment(comment);
             existingReview.setRating(updatedReview.getRating());
 
             elderlyRepository.save(elderly);
@@ -529,5 +606,18 @@ public class DoctorService implements IDoctorService{
         });
     }
 
-
+    public Date getElderlyBannedUntil(Long id) {
+        Optional<Elderly> optionalElderly = elderlyRepository.findById(id);
+        if (optionalElderly.isPresent()) {
+            Elderly elderly = optionalElderly.get();
+            LocalDateTime bannedUntilLocalDateTime = elderly.getBannedUntil();
+            if (bannedUntilLocalDateTime != null) {
+                return Date.from(bannedUntilLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                return null; // Or handle the case where bannedUntil is null
+            }
+        } else {
+            throw new RuntimeException("Elderly not found with id: " + id);
+            // Or handle the exception in a different way if needed
+        }}
 }
