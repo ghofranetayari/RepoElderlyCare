@@ -51,4 +51,5 @@ public class Relative implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Complaint> Complaints;
+
 }

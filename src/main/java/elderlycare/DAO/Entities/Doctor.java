@@ -44,17 +44,15 @@ public class Doctor implements Serializable{
     private String language;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy="doctor")
-    @JsonIgnore
     private List<MedicalFolder> medicalFolders;
 
-
     @OneToMany(cascade = CascadeType.ALL)
-    @JsonIgnore
+    private Set<Message> Messages;
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Complaint> Complaints;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
-    @JsonIgnore
     private OurUsers user;
 
 
@@ -63,7 +61,6 @@ public class Doctor implements Serializable{
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.REMOVE)
     @JsonIgnoreProperties("doctor")
-    @JsonIgnore
     private List<Elderly> elderlyList;
 
 

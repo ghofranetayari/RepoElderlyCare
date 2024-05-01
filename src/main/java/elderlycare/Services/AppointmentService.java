@@ -14,10 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -86,11 +88,15 @@ public class AppointmentService implements IAppointmentService {
             Appointment existingAppointment = appointmentRepository.findById(appointment.getIdAppointment()).orElse(null);
 
             if (existingAppointment == null) {
+
                 // If the appointment doesn't exist, it's a new appointment, so set the relationship and save
                 elderly.getAppointments().add(appointment);
                 calendar.getAppointments().add(appointment);
                 appointment.setArchiveApp("0");
-
+                String appFromFormatted = formatTimestamp(appointment.getAppFrom());
+                String appToFormatted = formatTimestamp(appointment.getAppTo());
+                appointment.setAppFrom(appFromFormatted);
+                appointment.setAppTo(appToFormatted);
                 elderlyRepository.save(elderly);
                 calendarRepository.save(calendar);
                 appointmentRepository.save(appointment);
@@ -112,6 +118,10 @@ public class AppointmentService implements IAppointmentService {
             // Handle the case where the Elderly or Calendar entity with the given ID is not found
             return null;
         }
+    }
+    private String formatTimestamp(String timestamp) {
+        LocalDateTime dateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME);
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     @Transactional
@@ -287,6 +297,26 @@ public class AppointmentService implements IAppointmentService {
         }
         return approvedAppointments;
     }
+    @Override
+    public List<Appointment> getApprovedOnlineAppointmentsByCalendarId(Long calendarId) {
+        // Retrieve the calendar by ID
+        Calendar calendar = calendarRepository.findById(calendarId)
+                .orElseThrow(() -> new RuntimeException("Calendar not found with ID: " + calendarId));
+        // Now, you can access the appointments of the calendar
+        List<Appointment> appointments = calendar.getAppointments();
+        // Filter appointments with status "Approved"
+        List<Appointment> approvedOnlineAppointments = appointments.stream()
+                .filter(appointment ->
+                        AppointmentStatus.APPROVED.equals(appointment.getAppStatus()) &&
+                                Boolean.TRUE.equals(appointment.getAppFirst())
+                )
+                .collect(Collectors.toList());
+        return approvedOnlineAppointments;
+    }
+
+
+
+
     public void markAppointmentRejected(long id) {
         Appointment app = getAppointmentById(id);
         // Assuming you have a method to get the status 'REJECTED' from the enum

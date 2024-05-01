@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -97,13 +98,10 @@ public class Elderly {
     Cart carts;
 
     @OneToOne(mappedBy = "elderlyt")
-    @JsonIgnore
     TodoList toDoList;
     @OneToMany(mappedBy = "elderlyf")
-    @JsonIgnore
     List<ForumPost> forumPosts; // An elderly can make
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<Review> reviewsE;
 
 
@@ -115,7 +113,11 @@ public class Elderly {
   /*  public void setElderlyId(Long elderlyId) {
         this.elderlyID = elderlyId;
     }*/
-  @OneToOne
+  public void setElderlyId(Long elderlyId) {
+      this.elderlyID = elderlyId;
+  }
+
+    @OneToOne
   @JoinColumn(name = "relative_id")
   private Relative relative;
 
@@ -123,6 +125,66 @@ public class Elderly {
         return this.relative;
     }
 
+
+
+    //oumayma
+    private int badWordCount;
+    private boolean banned;
+    private LocalDateTime bannedUntil;
+
+    // Getter and setter methods for other fields
+
+    public int getBadWordCount() {
+        return badWordCount;
+    }
+
+    public void setBadWordCount(int badWordCount) {
+        this.badWordCount = badWordCount;
+    }
+
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+
+    public LocalDateTime getBannedUntil() {
+        return bannedUntil;
+    }
+
+    public void setBannedUntil(LocalDateTime bannedUntil) {
+        this.bannedUntil = bannedUntil;
+    }
+
+    // Increment bad word count and apply ban if necessary
+    public void incrementBadWordCount() {
+        this.badWordCount++;
+        if (this.badWordCount == 3 ) {
+            this.setBanned(true);
+            this.setBannedUntil(LocalDateTime.now().plusDays(3)); // Ban for 3 days
+        } else if (this.badWordCount >= 5) {
+            this.setBanned(true);
+            this.setBannedUntil(LocalDateTime.now().plusDays(7)); // Ban for 7 days
+        }
+        // Reset bad word count after the ban period
+        else if (this.badWordCount >= 6) {
+            // Archive the user account
+            this.user.setArchive(true);
+        }
+    }
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "board_id")
+    private Board board;
+    public Board getBoard() {
+        return board;
+    }
+
+    // Setter for Board
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 
 
 }

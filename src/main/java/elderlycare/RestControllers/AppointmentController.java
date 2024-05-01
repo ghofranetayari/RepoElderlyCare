@@ -37,13 +37,13 @@ public class AppointmentController {
     public Appointment getAppointmentById(@PathVariable long id) {
         return iAppointmentService.getAppointmentById(id);
 
-}
-   /* @PutMapping("/UpdateApp/{id}")
-    public Appointment updateAppointment(@PathVariable long id, @RequestBody Appointment updatedAppointment) {
-       return  iAppointmentService.updateAppointment(id, updatedAppointment);
+    }
+    /* @PutMapping("/UpdateApp/{id}")
+     public Appointment updateAppointment(@PathVariable long id, @RequestBody Appointment updatedAppointment) {
+        return  iAppointmentService.updateAppointment(id, updatedAppointment);
 
 
-    }*/
+     }*/
     @DeleteMapping("/DeleteApp/{id}")
     public ResponseEntity<Void> cancelAppointment(@PathVariable long id) {
         iAppointmentService.cancelAppointment(id);
@@ -163,6 +163,18 @@ public class AppointmentController {
         try {
             List<Appointment> approvedAppointments = iAppointmentService.getApprovedAppointmentsByCalendarId(calendarId);
             return new ResponseEntity<>(approvedAppointments, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            // Handle the case when the calendar is not found
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{calendarId}/online-appointments")
+    public ResponseEntity<List<Appointment>> getApprovedOnlineAppointmentsByCalendarId(
+            @PathVariable Long calendarId) {
+        try {
+            List<Appointment> approvedOnlineAppointments = iAppointmentService.getApprovedOnlineAppointmentsByCalendarId(calendarId);
+            return new ResponseEntity<>(approvedOnlineAppointments, HttpStatus.OK);
         } catch (RuntimeException e) {
             // Handle the case when the calendar is not found
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
