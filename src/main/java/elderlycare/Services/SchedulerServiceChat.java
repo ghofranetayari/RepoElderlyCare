@@ -21,7 +21,7 @@ public class SchedulerServiceChat {
 
     @Transactional
     public List<Nurse> getAllNursesWithElderly() {
-        return nurseRepository.findAll(); // Retrieve all nurses with their assigned elderly
+        return nurseRepository.findAll();
     }
 
     @Transactional

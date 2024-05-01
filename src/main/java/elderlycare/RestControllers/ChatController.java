@@ -1,14 +1,18 @@
 package elderlycare.RestControllers;
+
+import elderlycare.DAO.Entities.ChatMessage;
 import elderlycare.DAO.Entities.OurUsers;
 import elderlycare.DAO.Repositories.OurUserRepo;
 import elderlycare.Services.UserService;
 import elderlycare.dto.ChatMessageRequest;
 import elderlycare.dto.VoiceMessageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import elderlycare.DAO.Entities.ChatMessage;
 import elderlycare.Services.ChatMessageService;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +44,10 @@ public class ChatController {
     @PostMapping("/send-voice-message")
     public ResponseEntity<Object> sendVoiceMessage(@RequestBody VoiceMessageRequest request) {
 
-        byte[] audioData = request.getAudioContent(); // Get audio data from request
-        chatService.saveVoiceMessage(request.getSenderId(), request.getRecipientId(), audioData);
-        return ResponseEntity.ok().body(Map.of("message", "Voice message saved successfully"));
+            byte[] audioData = request.getAudioContent();
+            chatService.saveVoiceMessage(request.getSenderId(), request.getRecipientId(), audioData);
+            return ResponseEntity.ok().body(Map.of("message", "Voice message saved successfully"));
+
     }
 
     // ChatController.java
@@ -94,5 +99,23 @@ public class ChatController {
         List<OurUsers> users =
                 userRepo.findByEmailContaining(email);
         return ResponseEntity.ok(users);}
+    //mariem
+    @GetMapping("/online-status")
+    public ResponseEntity<?> getOnlineStatus() {
+        try {
+            Map<String, Boolean> onlineStatus = userService.getOnlineStatus();
+            return ResponseEntity.ok(onlineStatus);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching online status");
+        }
+    }
+
+    //mariem
+    @PutMapping("/update-online-status/{email}")
+    public void updateUserOnlineStatus(@PathVariable String email, @RequestBody boolean online) {
+        userService.updateUserOnlineStatus(email, online);
+    }
+
+
 
 }
