@@ -32,6 +32,7 @@ public class Elderly {
     private String gender;
     private double latitude;
     private double longitude;
+    private double compte;
 
     private String preferences;
     private String healthRecord;
@@ -52,9 +53,13 @@ public class Elderly {
     @JsonIgnore
     Nurse nurse;
 
-
-    @ManyToMany(mappedBy="elderlys", cascade = CascadeType.ALL)
-    @JsonIgnore
+@JsonIgnore
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "elderly_event",
+            joinColumns = @JoinColumn(name = "elderly_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
     private List<Event> events;
 
     // @ManyToMany(cascade = CascadeType.ALL)
