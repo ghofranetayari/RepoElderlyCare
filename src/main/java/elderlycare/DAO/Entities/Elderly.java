@@ -54,6 +54,7 @@ public class Elderly {
 
 
     @ManyToMany(mappedBy="elderlys", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Event> events;
 
     // @ManyToMany(cascade = CascadeType.ALL)
@@ -61,17 +62,21 @@ public class Elderly {
 
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Complaint> Complaints;
 
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Message> Messages;
 
 
 
     @OneToOne(mappedBy="elderlyMedF")
+    @JsonIgnore
     private MedicalFolder medicalfolder;
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
     List<Appointment> appointments;
 
     @OneToOne
@@ -87,10 +92,13 @@ public class Elderly {
     Cart carts;
 
     @OneToOne(mappedBy = "elderlyt")
+    @JsonIgnore
     TodoList toDoList;
     @OneToMany(mappedBy = "elderlyf")
+    @JsonIgnore
     List<ForumPost> forumPosts; // An elderly can make
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Review> reviewsE;
 
 
@@ -99,9 +107,17 @@ public class Elderly {
         return elderlyID;
     }
 
-    public void setElderlyId(Long elderlyId) {
+  /*  public void setElderlyId(Long elderlyId) {
         this.elderlyID = elderlyId;
+    }*/
+  @OneToOne
+  @JoinColumn(name = "relative_id")
+  private Relative relative;
+
+    public Relative getRelative() {
+        return this.relative;
     }
+
 
 
 }

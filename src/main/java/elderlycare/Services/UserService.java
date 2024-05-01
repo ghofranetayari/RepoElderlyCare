@@ -17,10 +17,9 @@ public class UserService {
     private OurUserRepo ourUserRepo;
     @Autowired
     private RoleStatistic roleStatistic;
-    @Autowired
-    public UserService(OurUserRepo userRepository) {
-        this.ourUserRepo = userRepository;
-    }
+
+
+
 
 
     public int ArchiveUser(Integer Id) {
@@ -51,35 +50,18 @@ public class UserService {
 
     }
 
+    // Méthode privée pour mettre à jour les statistiques lors de l'archivage d'un utilisateur
     private void updateStatisticsOnArchive(OurUsers ourUsers) {
-        // Mise à jour des statistiques en fonction du type d'utilisateur archivé
-        if (ourUsers.getRole().equals("doctor")) {
-            roleStatistic.decrementDoctorCount();
-        } else if (ourUsers.getRole().equals("nurse")) {
-            roleStatistic.decrementNurseCount();
-        } else if (ourUsers.getRole().equals("elderly")) {
-            roleStatistic.decrementElderlyCount();
-        } else if (ourUsers.getRole().equals("ambulanceDriver")) {
-            roleStatistic.decrementAmbulanceDriverCount();
-        } else if (ourUsers.getRole().equals("ambulanceOwner")) {
-            roleStatistic.decrementAmbulanceOwnerCount();
-        }
+        String role = ourUsers.getRole();
+        roleStatistic.updateUserRemovedStatistics(role);
     }
 
-    private void updateStatisticsOnActivate(OurUsers ourUsers){
-        // Mise à jour des statistiques en fonction du type d'utilisateur activé
-        if (ourUsers.getRole().equals("doctor")) {
-            roleStatistic.incrementDoctorCount();
-        } else if (ourUsers.getRole().equals("nurse")) {
-            roleStatistic.incrementNurseCount();
-        } else if (ourUsers.getRole().equals("elderly")) {
-            roleStatistic.incrementElderlyCount();
-        } else if (ourUsers.getRole().equals("ambulanceDriver")) {
-            roleStatistic.incrementAmbulanceDriverCount();
-        } else if (ourUsers.getRole().equals("ambulanceOwner")) {
-            roleStatistic.incrementAmbulanceOwnerCount();
-        }
+    // Méthode privée pour mettre à jour les statistiques lors de l'activation d'un utilisateur
+    private void updateStatisticsOnActivate(OurUsers ourUsers) {
+        String role = ourUsers.getRole();
+        roleStatistic.updateUserAddedStatistics(role);
     }
+
     public Optional<OurUsers> getUserDetailsByEmail(String email) {
         return ourUserRepo.findByEmail(email);
     }

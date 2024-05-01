@@ -10,6 +10,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 @Builder
 @Getter
@@ -43,4 +44,11 @@ public class Relative implements Serializable {
 
     @ManyToOne
     Elderly elderly;
+    public Long getRelativeID() {
+        return idRelative;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Complaint> Complaints;
 }
