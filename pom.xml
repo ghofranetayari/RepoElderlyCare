@@ -79,7 +79,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
-
+        <!-- ***************map*************** -->
+        <dependency>
+            <groupId>com.google.maps</groupId>
+            <artifactId>google-maps-services</artifactId>
+            <version>0.15.0</version> <!-- Ou une version plus récente -->
+        </dependency>
         <!-- Google Maps Geocoding API -->
 
         <dependency>
