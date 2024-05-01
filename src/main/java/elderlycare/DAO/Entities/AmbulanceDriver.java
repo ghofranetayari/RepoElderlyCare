@@ -30,6 +30,10 @@ public class AmbulanceDriver implements Serializable {
 
     private boolean onDuty;
     private String drivingExperienceYears;
+    private  float totalSalary;
+    private Float totalForDriver;
+    private Float total;
+
 
 
     public boolean getOnDuty() {

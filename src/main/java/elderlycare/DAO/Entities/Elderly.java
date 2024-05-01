@@ -16,6 +16,7 @@ import java.util.List;
 public class Elderly {
 
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long elderlyID;
@@ -35,6 +36,7 @@ public class Elderly {
     private String preferences;
     private String healthRecord;
     private String role;
+    private String tracking;
 
 
     @OneToOne
@@ -100,4 +102,6 @@ public class Elderly {
     public void setElderlyId(Long elderlyId) {
         this.elderlyID = elderlyId;
     }
+
+
 }

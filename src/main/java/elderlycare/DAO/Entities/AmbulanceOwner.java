@@ -41,7 +41,8 @@ public class AmbulanceOwner implements Serializable {
     @OneToMany
     List<Complaint> complaintList;
 
-
+    @OneToMany
+    List<Message> messages;
 
     public Long getAmbulanceOwnerID() {
         return AmbulanceOwnerID;

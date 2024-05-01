@@ -414,7 +414,7 @@ public class AuthService {
                     case "relative":
                         Optional<Relative> relativeOptional = relativeRepository.findByUserId(user.getId());
                         if (relativeOptional.isPresent()) {
-                            signinRequest.setRoleId(relativeOptional.get().getRelativeID());
+                            signinRequest.setRoleId(relativeOptional.get().getIdRelative());
                         }
                         break;
                     default:

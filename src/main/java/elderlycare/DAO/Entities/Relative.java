@@ -32,8 +32,8 @@ public class Relative implements Serializable {
     private LocalDate dateOfBirth;
     private String address;
     private String gender;
-    private long etats;
-
+    private  Long etats;
+    private String role;
     @OneToOne
     @JoinColumn(name = "user_id") // Assurez-vous que le nom correspond à la colonne appropriée dans votre table
     private OurUsers user;
@@ -43,10 +43,4 @@ public class Relative implements Serializable {
 
     @ManyToOne
     Elderly elderly;
-    private String role;
-
-    public Long getRelativeID() {
-        return idRelative;
-    }
-
 }

@@ -108,7 +108,7 @@ public class ServiceNadhir implements IserviceNadhir{
         Optional<Relative> optionalRelative = relativeRepository.findById(idRelative);
         if (optionalRelative.isPresent()) {
             Relative relative = optionalRelative.get();
-            relative.setEtats(1); // Mettre l'état à 1
+            relative.setEtats(1L); // Mettre l'état à 1
             return relativeRepository.save(relative);
         } else {
             throw new RuntimeException("Relative not found with id: " + idRelative);
