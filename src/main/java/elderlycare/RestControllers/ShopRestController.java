@@ -2,11 +2,14 @@ package elderlycare.RestControllers;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Charge;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Token;
 import com.stripe.param.PaymentIntentCreateParams;
 import elderlycare.DAO.Entities.Elderly;
 import elderlycare.DAO.Entities.Orderr;
 import elderlycare.DAO.Entities.Product;
+import elderlycare.DAO.Entities.Relative;
 import elderlycare.DAO.Repositories.*;
 import elderlycare.Services.ShopService;
 import lombok.AllArgsConstructor;
@@ -28,10 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
@@ -45,9 +45,93 @@ class ShopRestController {
     Notificationshoprepo notificationshoprepo ;
     ElderlyRepository elderlyRepository;
     ProductRepository productRepository;
-
+    RelativeRepository relativeRepository ;
     // Load your Stripe secret key from application.properties
     private static final Logger logger = LoggerFactory.getLogger(ShopRestController.class);
+
+    @PostMapping("/pay-relative/{relativeId}")
+    public ResponseEntity<?> payRelative(@PathVariable long relativeId, @RequestParam double amount, @RequestParam String tokenId) {
+        try {
+            // Retrieve the relative based on the provided ID
+            Relative relative = relativeRepository.findById(relativeId)
+                    .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+
+            // Retrieve the associated elderly
+            Elderly elderly = relative.getElderly();
+
+            // Initialize Stripe API key
+            Stripe.apiKey = "sk_test_51OEf1yIE7WmosFsXFp9azlkFtgqDMHC0wO96VoXtExTd44jxxd1P765jdwhwj8F7ObkSem4CHn2pDD6Bopm7taXj001W4LVvcp";
+
+            // Create payment charge using the payment token
+            Map<String, Object> chargeParams = new HashMap<>();
+            chargeParams.put("amount", (int) (amount * 100)); // Convert amount to cents
+            chargeParams.put("currency", "usd");
+            chargeParams.put("description", "Charge for relative payment");
+            chargeParams.put("source", tokenId);
+
+            Charge charge = Charge.create(chargeParams);
+
+            // If payment is successful, update elderly's account and return success response
+            if (charge.getStatus().equals("succeeded")) {
+                double updatedCompte = elderly.getCompte() + amount;
+                elderly.setCompte(updatedCompte);
+                elderlyRepository.save(elderly);
+                return ResponseEntity.ok("Payment successful. Amount added to elderly's account. New account balance: " + updatedCompte);
+            } else {
+                // If payment fails, return internal server error
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during payment.");
+            }
+        } catch (ChangeSetPersister.NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relative not found with ID: " + relativeId);
+        } catch (StripeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during payment: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/buyOrderWithElderlyAccount/{orderId}/{elderlyId}")
+    public ResponseEntity<?> buyOrderWithElderlyAccount(@PathVariable  long orderId, @PathVariable long elderlyId) {
+        try {
+            // Retrieve the order based on the provided order ID
+            Orderr order = shopserive.findById(orderId);
+
+            // If the order doesn't exist, return a not found response
+            if (order == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Retrieve the elderly based on the provided elderly ID
+            Elderly elderly = elderlyRepository.findById(elderlyId)
+                    .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+
+            // Check if the elderly has enough money in their account to buy the order
+            double totalPrice = order.getTotalPrice();
+            double reducedPrice = totalPrice * 0.95; // Apply 5% reduction
+            if (elderly.getCompte() >= reducedPrice) {
+                // Deduct the reduced order price from the elderly's account
+                double updatedCompte = elderly.getCompte() - reducedPrice;
+                elderly.setCompte(updatedCompte);
+                elderlyRepository.save(elderly);
+
+                // Mark the order as bought
+                shopserive.buyOrder(order);
+
+                // Return a success response
+                return ResponseEntity.ok("Order bought successfully with a 5% discount");
+            } else {
+                // Return a response indicating insufficient funds
+                return ResponseEntity.badRequest().body("You don't have enough money to buy this order");
+            }
+        } catch (ChangeSetPersister.NotFoundException e) {
+            // Return a not found response if the elderly is not found
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            // Return an internal server error response for any other unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to buy order: " + e.getMessage());
+        }
+    }
+
+
 
 
 
@@ -304,5 +388,13 @@ class ShopRestController {
         return ResponseEntity.ok(imageUrl);
     }
 
+    @GetMapping("/elderly/{elderlyId}/boughtOrders")
+    public ResponseEntity<List<Orderr>> getBoughtOrdersForElderly(@PathVariable Long elderlyId) {
+        List<Orderr> boughtOrders = shopserive.getBoughtOrdersForElderly(elderlyId);
+        if (boughtOrders.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(boughtOrders);
+    }
 
 }

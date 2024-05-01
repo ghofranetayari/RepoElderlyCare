@@ -1,8 +1,24 @@
 package elderlycare.Services;
 
+import com.stripe.model.Order;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
 import elderlycare.DAO.Entities.*;
 import elderlycare.DAO.Repositories.*;
+import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +64,8 @@ public class ShopService implements IShopService {
     private static final String ACCOUNT_SID = "your_account_sid";
     private static final String AUTH_TOKEN = "your_auth_token";
 
-
+    @Autowired
+    private Configuration freemarkerConfig;
 
     public Set<Orderr> getElderlyCart(Long elderlyId) {
         Elderly elderly = elderlyRepository.findById(elderlyId)
@@ -176,7 +194,7 @@ public class ShopService implements IShopService {
 
 
 
-    public static String uploadDirectory = "C:/xamppp/htdocs/hazemimage";
+    public static String uploadDirectory = "C:/xampp/htdocs/hazemimage";
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -232,6 +250,37 @@ public class ShopService implements IShopService {
         return true;
     }
 
+    public void sendHtmlEmailWithImage(String toEmail, String subject, String templateName, Map<String, Object> templateModel) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            // Set the recipients and subject
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+
+            // Use FreeMarker to process the template content
+            Template template = freemarkerConfig.getTemplate(templateName + ".ftl");
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, templateModel);
+
+            // Set HTML content with the processed template
+            helper.setText(htmlContent, true);
+
+            // Add the image as an inline attachment
+            String imageUrl = (String) templateModel.get("imageUrl");
+            FileSystemResource imageResource = new FileSystemResource(imageUrl);
+            helper.addInline("image_cid", imageResource, "image/png");
+
+            // Send the email
+            mailSender.send(message);
+            System.out.println("HTML Email Sent Successfully!");
+        } catch (MessagingException | IOException | TemplateException e) {
+            System.err.println("Error sending HTML email with image: " + e.getMessage());
+            // Handle or log the exception as needed
+        }
+    }
+
+
     public Product updateProduct(Long id, Product updatedProductData, MultipartFile file) throws IOException {
         Product existingProduct = getProductById(id);
 
@@ -241,7 +290,10 @@ public class ShopService implements IShopService {
 
             // Send email to each elderly user
             String subject = "Product Capacity Update Notification";
-            String body = "Dear Elderly, the capacity of the product you are interested in has been updated.";
+            String body = "Dear Elderly, the capacity of the product " + updatedProductData.getProductName() + " you are interested in has been updated.";
+            Map<String, Object> templateModel = new HashMap<>();
+            templateModel.put("productName", updatedProductData.getProductName());
+            templateModel.put("imageUrl", "C:\\xampp\\htdocs\\hazemimage\\" + existingProduct.getImageUrl());
 
             for (String elderlyEmail : elderlyEmails) {
                 // Validate the email address format
@@ -251,7 +303,7 @@ public class ShopService implements IShopService {
                 }
 
                 // Send email
-                sendSimpleEmail(Collections.singletonList(elderlyEmail), subject, body);
+                sendHtmlEmailWithImage(elderlyEmail, subject, "email_template", templateModel);
                 deleteNotificationLineForProduct(id);
 
             }
@@ -292,110 +344,6 @@ public class ShopService implements IShopService {
         return productRepository.save(existingProduct);
     }
 
-    private void deleteNotificationLineForProduct(Long productId) {
-        notificationrepo.deleteByProductId(productId);
-    }
-
-
-
-    public Product toggleProductStatus(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        // Toggle the status
-        if (product.getArchProd().equals("Available")) {
-            product.setArchProd("Not Available");
-        } else {
-            product.setArchProd("Available");
-        }
-
-        return productRepository.save(product);
-    }
-
-    public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
-        }
-        productRepository.deleteById(id);
-    }
-
-    public void uploadImage(Long id, MultipartFile file) throws IOException {
-        Product product = getProductById(id);
-        if (file.isEmpty()) {
-            throw new RuntimeException("Failed to store empty file");
-        }
-        String uploadDirectory = "C:/xamppp/htdocs/hazemimage/";
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        String filePath = uploadDirectory + fileName;
-        Files.createDirectories(Paths.get(uploadDirectory));
-        Files.copy(file.getInputStream(), Paths.get(filePath));
-        product.setImageUrl(filePath);
-        productRepository.save(product); // Save the updated product with image URL
-    }
-
-    public String getImageUrl(Long id) {
-        Product product = getProductById(id);
-        return product.getImageUrl();
-    }
-
-
-    public Orderr findById(long orderId) {
-        Optional<Orderr> optionalOrder = orderrRepository.findById(orderId);
-        return optionalOrder.orElse(null);
-    }
-
-    public void buyOrder(Orderr order) {
-        // Update order status to "bought"
-        order.setOrderStatus("bought");
-
-        // Adjust product capacity
-        double remainingCapacity = order.getProduct().getProdCapacity() - order.getQuantite();
-        order.getProduct().setProdCapacity(remainingCapacity);
-
-        // Save changes
-        orderrRepository.save(order);
-
-    }
-
-
-    public void cancelOrder(Long orderId) {
-        Orderr order = orderrRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        // Remove the association with the product
-        order.setProduct(null);
-
-        // Delete the order
-        orderrRepository.deleteById(orderId);
-    }
-    public double getProductCapacityByOrderId(Long orderId) {
-        Orderr order = orderrRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        Product product = order.getProduct();
-        if (product != null) {
-            return product.getProdCapacity();
-        } else {
-            throw new RuntimeException("Product not found for order ID: " + orderId);
-        }
-    }
-
-
-    public Page<Product> getAllProductspage(Pageable pageable) {
-        return productRepository.findAllAvailableProducts(pageable);
-    }
-
-
-
-    public void saveNotification(Elderly elderly, Product product) {
-        Notificationshop notification = Notificationshop.builder()
-                .elderly(elderly)
-                .product(product)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notificationrepo.save(notification);
-    }
-    private final JavaMailSender mailSender;
 
     public void sendSimpleEmail(List<String> toEmails, String subject, String body) {
         try {
@@ -437,6 +385,142 @@ public class ShopService implements IShopService {
             log.error("Error sending email: " + e.getMessage(), e);
         }
     }
+
+
+
+    private void deleteNotificationLineForProduct(Long productId) {
+        notificationrepo.deleteByProductId(productId);
+    }
+
+
+
+    public Product toggleProductStatus(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Toggle the status
+        if (product.getArchProd().equals("Available")) {
+            product.setArchProd("Not Available");
+        } else {
+            product.setArchProd("Available");
+        }
+
+        return productRepository.save(product);
+    }
+
+    public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found");
+        }
+        productRepository.deleteById(id);
+    }
+
+    public void uploadImage(Long id, MultipartFile file) throws IOException {
+        Product product = getProductById(id);
+        if (file.isEmpty()) {
+            throw new RuntimeException("Failed to store empty file");
+        }
+        String uploadDirectory = "C:/xampp/htdocs/hazemimage/";
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String filePath = uploadDirectory + fileName;
+        Files.createDirectories(Paths.get(uploadDirectory));
+        Files.copy(file.getInputStream(), Paths.get(filePath));
+        product.setImageUrl(filePath);
+        productRepository.save(product); // Save the updated product with image URL
+    }
+
+    public String getImageUrl(Long id) {
+        Product product = getProductById(id);
+        return product.getImageUrl();
+    }
+
+
+    public Orderr findById(long orderId) {
+        Optional<Orderr> optionalOrder = orderrRepository.findById(orderId);
+        return optionalOrder.orElse(null);
+    }
+
+    public void buyOrder(Orderr order) {
+        // Update order status to "bought"
+        order.setOrderStatus("bought");
+
+        // Adjust product capacity
+        double remainingCapacity = order.getProduct().getProdCapacity() - order.getQuantite();
+        order.getProduct().setProdCapacity(remainingCapacity);
+
+        // Save changes
+        orderrRepository.save(order);
+
+    }
+    public void buyOrderWithElderlyAccount(Orderr order, Elderly elderly) {
+        double productPrice = order.getProduct().getPrice();
+        double elderlyBalance = elderly.getCompte();
+
+        // Check if elderly has enough money to buy the product
+        if (elderlyBalance >= productPrice) {
+            // Update order status to "bought"
+            order.setOrderStatus("bought");
+
+            // Adjust product capacity
+            double remainingCapacity = order.getProduct().getProdCapacity() - order.getQuantite();
+            order.getProduct().setProdCapacity(remainingCapacity);
+
+            // Deduct product price from elderly's account
+            double newBalance = elderlyBalance - productPrice;
+            elderly.setCompte(newBalance);
+
+            // Save changes
+            orderrRepository.save(order);
+            elderlyRepository.save(elderly);
+        } else {
+            // Show message: "You don't have enough money"
+            System.out.println("You don't have enough money in your account to buy this product.");
+        }
+    }
+
+
+
+    public void cancelOrder(Long orderId) {
+        Orderr order = orderrRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Remove the association with the product
+        order.setProduct(null);
+
+        // Delete the order
+        orderrRepository.deleteById(orderId);
+    }
+    public double getProductCapacityByOrderId(Long orderId) {
+        Orderr order = orderrRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        Product product = order.getProduct();
+        if (product != null) {
+            return product.getProdCapacity();
+        } else {
+            throw new RuntimeException("Product not found for order ID: " + orderId);
+        }
+    }
+
+
+
+    public Page<Product> getAllProductspage(Pageable pageable) {
+        return productRepository.findAllAvailableProducts(pageable);
+    }
+
+
+
+    public void saveNotification(Elderly elderly, Product product) {
+        Notificationshop notification = Notificationshop.builder()
+                .elderly(elderly)
+                .product(product)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationrepo.save(notification);
+    }
+    private final JavaMailSender mailSender;
+
+
 
 
 
@@ -626,8 +710,30 @@ public class ShopService implements IShopService {
         return productRepository.save(product);
     }
 
+    public List<Orderr> getBoughtOrdersForElderly(Long elderlyId) {
+        // Fetch the elderly from the database
+        Elderly elderly = elderlyRepository.findById(elderlyId)
+                .orElseThrow(() -> new RuntimeException("Elderly not found"));
 
+        // Retrieve the cart associated with the elderly
+        Cart cart = elderly.getCarts();
 
-
-
+        // Check if the cart is not null and has orders
+        if (cart != null && cart.getOrders() != null) {
+            // Filter the orders with status "bought"
+            return cart.getOrders().stream()
+                    .filter(order -> "bought".equalsIgnoreCase(order.getOrderStatus()))
+                    .map(order -> {
+                        order.setProductName(order.getProduct().getProductName());
+                        return order;
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            // Return an empty list if there are no bought orders or if the cart is null
+            return Collections.emptyList();
+        }
+    }
 }
+
+
+
