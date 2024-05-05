@@ -32,7 +32,7 @@ public class MonthlyFavoriteDoctorScheduler {
     @Autowired
 
     ElderlyRepository elderlyRepository;
-    /*
+
         // Schedule the method to run at the first day of every month at 12:00 AM
         //@Scheduled(cron = "0 0 0 1 * ?")
         @Scheduled(cron = "0 * * * * ?") // Run every minute for testing
@@ -98,7 +98,7 @@ public class MonthlyFavoriteDoctorScheduler {
 
             System.out.println("applyOrRemoveProductPromotion completed at: " + LocalDateTime.now());
         }
-    */
+
     @Scheduled(fixedRate = 86400000) // Run once a day (adjust the rate as needed)
     public void checkAndUpdateBans() {
         LocalDateTime now = LocalDateTime.now();
