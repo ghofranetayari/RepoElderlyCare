@@ -82,7 +82,6 @@ public class EventService implements IEventService {
         // Use the eventRepository to fetch all events from the database
         return eventRepository.findAll();
     }
-
     public Event updateEvent(Long eventId, Event updatedEvent, MultipartFile file) throws IOException {
         // Retrieve the existing event from the database
         Event existingEvent = eventRepository.findById(eventId)
@@ -93,6 +92,17 @@ public class EventService implements IEventService {
         existingEvent.setDate(updatedEvent.getDate());
         existingEvent.setDescription(updatedEvent.getDescription());
         existingEvent.setCapacity(updatedEvent.getCapacity());
+
+        // Update the place name if provided
+        String placeName = updatedEvent.getPlace();
+        if (placeName != null && !placeName.isEmpty()) {
+            existingEvent.setPlace(placeName);
+
+            // Get latitude and longitude from updated place name
+            Map<String, Double> latLong = getLatLongFromPlaceName(placeName);
+            existingEvent.setLatitude(latLong.get("latitude"));
+            existingEvent.setLongitude(latLong.get("longitude"));
+        }
 
         // If a new image file is provided, update the image
         if (file != null) {
@@ -113,7 +123,6 @@ public class EventService implements IEventService {
         // Save the updated event to the database
         return eventRepository.save(existingEvent);
     }
-
 
     public Optional<Event> getEventById(Long id) {
         return eventRepository.findById(id);
@@ -479,6 +488,6 @@ public class EventService implements IEventService {
 
 
 
-    // ... (create header and data rows)
+// ... (create header and data rows)
 
-    // Save the rkbook to a file
+// Save the rkbook to a file
