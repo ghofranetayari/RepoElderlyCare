@@ -67,6 +67,9 @@ public class ShopService implements IShopService {
     @Autowired
     private Configuration freemarkerConfig;
 
+    public double getAccountBalanceById(Long elderlyId) {
+        return elderlyRepository.findCompteById(elderlyId);
+    }
     public Set<Orderr> getElderlyCart(Long elderlyId) {
         Elderly elderly = elderlyRepository.findById(elderlyId)
                 .orElseThrow(() -> new RuntimeException("Elderly not found"));

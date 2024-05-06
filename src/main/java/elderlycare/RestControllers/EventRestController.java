@@ -217,9 +217,12 @@ public class EventRestController {
         return new ResponseEntity<>(maxEventCapacity, HttpStatus.OK);
     }
 
+    @GetMapping("/elderly/{id}/accountBalance")
+    public double getElderlyAccountBalance(@PathVariable Long id) {
+        return eventService.getAccountBalanceById(id);
+    }
 
 }
-
 
 
 
