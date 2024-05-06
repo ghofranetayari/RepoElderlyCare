@@ -39,7 +39,7 @@ public class EventService implements IEventService {
     }
     ElderlyRepository elderlyRepository;
 
-    public static String uploadDirectory = "C:/xampp/htdocs/hazemimage";
+    public static String uploadDirectory = "C:/xamppp/htdocs/hazemimage";
 
 
     private final EventRepository eventRepository;
@@ -480,6 +480,9 @@ public class EventService implements IEventService {
         };
 
         return resource;
+    }
+    public double getAccountBalanceById(Long elderlyId) {
+        return elderlyRepository.findCompteById(elderlyId);
     }
 
 

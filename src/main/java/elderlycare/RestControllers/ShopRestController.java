@@ -11,6 +11,7 @@ import elderlycare.DAO.Entities.Orderr;
 import elderlycare.DAO.Entities.Product;
 import elderlycare.DAO.Entities.Relative;
 import elderlycare.DAO.Repositories.*;
+import elderlycare.Services.EventService;
 import elderlycare.Services.ShopService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -48,6 +49,12 @@ class ShopRestController {
     RelativeRepository relativeRepository ;
     // Load your Stripe secret key from application.properties
     private static final Logger logger = LoggerFactory.getLogger(ShopRestController.class);
+    private final EventService eventService;
+
+    @GetMapping("/elderly/{id}/accountBalance")
+    public double getElderlyAccountBalance(@PathVariable Long id) {
+        return eventService.getAccountBalanceById(id);
+    }
 
     @PostMapping("/pay-relative/{relativeId}")
     public ResponseEntity<?> payRelative(@PathVariable long relativeId, @RequestParam double amount, @RequestParam String tokenId) {

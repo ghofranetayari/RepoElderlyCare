@@ -34,4 +34,9 @@ public interface ElderlyRepository extends JpaRepository<Elderly, Long> {
     Optional<Elderly> findByEmail(String email);
 
 
+    @Query("SELECT e.compte FROM Elderly e WHERE e.elderlyID = :id")
+    double findCompteById(Long id);
+
+
+
 }

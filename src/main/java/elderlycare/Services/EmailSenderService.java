@@ -6,21 +6,43 @@ import elderlycare.DAO.Entities.AppointmentStatus;
 import elderlycare.DAO.Entities.Elderly;
 import elderlycare.DAO.Repositories.AppointementRepository;
 import elderlycare.DAO.Repositories.ElderlyRepository;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import freemarker.template.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.util.FileCopyUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 @Service
 public class EmailSenderService {
+    @Autowired
+    private TemplateEngine templateEngine;
+
+    @Autowired
+    private Configuration freemarkerConfig; // Autowire FreeMarker configuration
+
     @Autowired
     private JavaMailSender mailSender;
     @Autowired
@@ -29,6 +51,39 @@ public class EmailSenderService {
     @Autowired
 
     private ElderlyRepository elderlyRepository;
+
+
+
+    public void sendHtmlEmail(String toEmail, String subject, String templateName, Context context) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            // Set the recipients, subject, and content using FreeMarker processed HTML
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+
+            // Use FreeMarker to process the template content
+            Template template = freemarkerConfig.getTemplate(templateName + ".ftl"); // Load FreeMarker template
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, context);
+
+            // Set HTML content with the processed template
+            helper.setText(htmlContent, true);
+
+            // Add the image as an inline attachment
+            InputStreamSource imageSource = new ClassPathResource("static/images/logo.png");
+            helper.addInline("image_cid", imageSource, "image/png");
+
+            // Send the email
+            mailSender.send(message);
+            System.out.println("HTML Email Sent Successfully!");
+        } catch (MessagingException | IOException | TemplateException e) {
+            System.err.println("Error sending HTML email: " + e.getMessage());
+            // Handle or log the exception as needed
+        }
+    }
+
+
     public void sendSimpleEmail(String toEmail,
                                 String subject,
                                 String body
@@ -60,20 +115,29 @@ public class EmailSenderService {
             sendReminder(appointment);
         }
     }
-    private void sendReminder(Appointment appointment) {
+    /* private void sendReminder(Appointment appointment) {
 
-        // Logic to get elder's email and send a reminder
+         // Logic to get elder's email and send a reminder
+         String elderEmail = getElderEmailForAppointment(appointment);
+         String subject = "Reminder: Your Appointment is in an hour";
+         String body = "Dear Elder, Your appointment is scheduled in an hour. Please be prepared.";
+         System.out.println("Sending reminder email:");
+         System.out.println("Recipient: " + elderEmail);
+         System.out.println("Subject: " + subject);
+         System.out.println("Body: " + body);
+
+         sendSimpleEmail(elderEmail, subject, body);
+     }*/
+    public void sendReminder(Appointment appointment) {
         String elderEmail = getElderEmailForAppointment(appointment);
         String subject = "Reminder: Your Appointment is in an hour";
-        String body = "Dear Elder, Your appointment is scheduled in an hour. Please be prepared.";
-        System.out.println("Sending reminder email:");
-        System.out.println("Recipient: " + elderEmail);
-        System.out.println("Subject: " + subject);
-        System.out.println("Body: " + body);
 
-        sendSimpleEmail(elderEmail, subject, body);
+        // Set the message variable in the FreeMarker model
+        Context context = new Context();
+        context.setVariable("message", "Dear Elder, Your appointment is scheduled in an hour. Please be prepared.");
+
+        sendHtmlEmail(elderEmail, subject, "apptemplate", context);
     }
-
     private String getElderEmailForAppointment(Appointment appointment) {
         List<Elderly> elderlies = elderlyRepository.findAll(); // Implement your service method to get all elderly individuals
 
